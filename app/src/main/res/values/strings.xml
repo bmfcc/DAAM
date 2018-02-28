@@ -2,5 +2,6 @@
     <string name="app_name">DAM</string>
     <string name="select_language">Select Language</string>
     <string name="PT_button">Portuguese</string>
+    <string name="ES_button">Spanish</string>
     <string name="EN_button">English</string>
 </resources>
