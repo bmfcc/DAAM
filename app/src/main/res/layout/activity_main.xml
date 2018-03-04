@@ -7,12 +7,13 @@
     tools:context="com.iscte.dam.MainActivity">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/PT_button"
         android:layout_width="240dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="60dp"
+        android:onClick="selectLanguage"
         android:text="@string/PT_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +25,7 @@
         android:layout_height="46dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="82dp"
         android:text="@string/select_language"
         android:textAlignment="center"
         android:textSize="24sp"
@@ -34,27 +35,29 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/EN_button"
         android:layout_width="240dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="selectLanguage"
         android:text="@string/EN_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/PT_button" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/ES_button"
         android:layout_width="240dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="selectLanguage"
         android:text="@string/ES_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button2" />
+        app:layout_constraintTop_toBottomOf="@+id/EN_button" />
 
 </android.support.constraint.ConstraintLayout>
