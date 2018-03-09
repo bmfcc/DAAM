@@ -23,6 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         textView.setText(message);
     }
 
+    //testing
 
     public void selectedZooLocation(View view){
         int viewID = view.getId();
@@ -31,4 +32,5 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomeActivity2.class);
         startActivity(intent);
     }
+
 }
