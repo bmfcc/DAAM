@@ -23,7 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         textView.setText(message);
     }
 
-    //testing
+    //testin'
 
     public void selectedZooLocation(View view){
         int viewID = view.getId();
