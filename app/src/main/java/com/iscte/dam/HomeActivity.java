@@ -3,6 +3,8 @@ package com.iscte.dam;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -19,5 +21,14 @@ public class HomeActivity extends AppCompatActivity {
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
         textView.setText(message);
+    }
+
+
+    public void selectedZooLocation(View view){
+        int viewID = view.getId();
+        String resourceName = getResources().getResourceEntryName(viewID);
+        Log.d("MainAtivitityLog",resourceName);
+        Intent intent = new Intent(this, HomeActivity2.class);
+        startActivity(intent);
     }
 }
