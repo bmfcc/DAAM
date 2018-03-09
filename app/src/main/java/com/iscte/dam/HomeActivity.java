@@ -23,8 +23,6 @@ public class HomeActivity extends AppCompatActivity {
         textView.setText(message);
     }
 
-    //testin'
-
     public void selectedZooLocation(View view){
         int viewID = view.getId();
         String resourceName = getResources().getResourceEntryName(viewID);
