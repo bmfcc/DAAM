@@ -1,6 +1,8 @@
 package com.iscte.dam;
 
+import android.app.AlertDialog;
 import android.app.Notification;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -34,14 +36,36 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        /*NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "testing_notification")
-                .setContentTitle("Notification")
-                .setContentText("Testing Notification")
+        //Notificação
+        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "testing_notification")
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle("ZooZone")
+                .setContentText("Bem-vindo ao ZOO!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        notificationManager.notify(64647,mBuilder.build());*/
+        final AlertDialog.Builder notBuilder = new AlertDialog.Builder(this);
+        notBuilder.setMessage("Welcome to the XXX Zone! Do you wanna know more?")
+                .setTitle("XXX Zone");
+        notBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
+                toast.show();
+                dialog.dismiss();
+                goToZooLocation();
+            }
+        });
+        notBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
+                toast.show();
+                dialog.dismiss();
+            }
+        });
+
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
@@ -75,6 +99,10 @@ public class HomeActivity extends AppCompatActivity {
                         Log.d("beacon", "Welcome to the 1st floors");
                         Toast toast = Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT);
                         toast.show();
+                        notificationManager.notify(64647,mBuilder.build());
+
+                        AlertDialog dialog = notBuilder.create();
+                        dialog.show();
                         return null;
                     }
                 })
@@ -82,6 +110,8 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public Unit invoke(ProximityAttachment attachment) {
                         Log.d("beacon", "Bye bye, come visit us again on the 1st floor");
+                        Toast toast = Toast.makeText(getApplicationContext(), "Byeee", Toast.LENGTH_SHORT);
+                        toast.show();
                         return null;
                     }
                 })
@@ -121,6 +151,11 @@ public class HomeActivity extends AppCompatActivity {
         int viewID = view.getId();
         String resourceName = getResources().getResourceEntryName(viewID);
         Log.d("MainAtivitityLog",resourceName);
+        Intent intent = new Intent(this, HomeActivity2.class);
+        startActivity(intent);
+    }
+
+    public void goToZooLocation(){
         Intent intent = new Intent(this, HomeActivity2.class);
         startActivity(intent);
     }
