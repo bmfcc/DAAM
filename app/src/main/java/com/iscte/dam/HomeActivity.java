@@ -11,6 +11,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,8 @@ public class HomeActivity extends AppCompatActivity {
     private ProximityObserver.Handler proximityHandler = null;
     private String CHANNEL_ID = "notification_channelID";
 
+    public static final String PREFS_NAME = "MyPrefsFile";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +49,23 @@ public class HomeActivity extends AppCompatActivity {
         //Channel for Notifications applied only on API's +26
         createNotificationChannel();
 
-        // Get the Intent that started this activity and extract the string
-        Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.SELECTED_LANGUAGE);
+        //getSharedPreferences(PREFS_NAME, 0).edit().clear().commit();
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+        String language = preferences.getString("selected_language", "Default");
 
-        // Capture the layout's TextView and set the string as its text
-        TextView textView = findViewById(R.id.textView);
-        textView.setText(message);
+        if(language.equals("Default")){
+            selectLanguage();
+            finish();
+        }else {
+
+            // Get the Intent that started this activity and extract the string
+            Intent intent = getIntent();
+            String message = intent.getStringExtra(MainActivity.SELECTED_LANGUAGE);
+
+            // Capture the layout's TextView and set the string as its text
+            TextView textView = findViewById(R.id.textView);
+            textView.setText(message);
+        }
 
         setupBeacons();
 
@@ -213,7 +226,6 @@ public class HomeActivity extends AppCompatActivity {
                                 return null;
                             }
                         });
-
     }
 
     public void selectedZooLocation(View view){
@@ -221,6 +233,11 @@ public class HomeActivity extends AppCompatActivity {
         String resourceName = getResources().getResourceEntryName(viewID);
         Log.d("MainAtivitityLog",resourceName);
         Intent intent = new Intent(this, HomeActivity2.class);
+        startActivity(intent);
+    }
+
+    public void selectLanguage(){
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
