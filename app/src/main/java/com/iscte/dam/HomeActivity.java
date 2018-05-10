@@ -242,7 +242,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void selectLanguage(){
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, Main2Activity.class);
         startActivity(intent);
     }
 

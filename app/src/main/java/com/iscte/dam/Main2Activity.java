@@ -1,10 +1,14 @@
 package com.iscte.dam;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -44,6 +48,9 @@ public class Main2Activity extends AppCompatActivity
     private ProximityObserver proximityObserver;
     private ProximityObserver.Handler proximityHandler = null;
     private String CHANNEL_ID = "notification_channelID";
+    protected String name = "my_package_channel";
+    protected String description = "my_package_first_channel";
+    protected int importance = NotificationManager.IMPORTANCE_HIGH;
 
     public static final String PREFS_NAME = "MyPrefsFile";
 
@@ -71,11 +78,17 @@ public class Main2Activity extends AppCompatActivity
             finish();
         }else {
 
-            // Get the Intent that started this activity and extract the string
-            Intent intent = getIntent();
-            String message = intent.getStringExtra(MainActivity.SELECTED_LANGUAGE);
+            String fromNotification = preferences.getString("activityFromNotification", "Default");
 
-            setupBeacons();
+            if(fromNotification.equals("Default") || fromNotification.equals("false")) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Let's START!", Toast.LENGTH_SHORT);
+                toast.show();
+                setupBeacons();
+            }else{
+                SharedPreferences.Editor editor=preferences.edit();
+                editor.putString("activityFromNotification","false");
+                editor.commit();
+            }
 
         }
     }
@@ -155,23 +168,28 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void goToZooLocation(){
-        Intent intent = new Intent(this, HomeActivity2.class);
-        startActivity(intent);
-    }
-
-    private void setupBeacons(){
-        EstimoteCloudCredentials cloudCredentials =
-                new EstimoteCloudCredentials("zoozone-how", "861b9e3dc034aa6c3a7afa2c51220271");
+    public void goToZooLocation(View view){
+        /*Intent intent = new Intent(this, HomeActivity2.class);
+        startActivity(intent);*/
 
         // Create an Intent for the activity you want to start
-        Intent intent = new Intent(this, HomeActivity2.class);
+        //Intent intent = new Intent(this, HomeActivity2.class);
+        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this,0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Create the TaskStackBuilder and add the intent, which inflates the back stack
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(intent);
         // Get the PendingIntent containing the entire back stack
         PendingIntent pendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Getting ready", Toast.LENGTH_SHORT);
+        toast.show();
 
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID )
                 .setSmallIcon(R.drawable.ic_stat_name)
@@ -179,8 +197,85 @@ public class Main2Activity extends AppCompatActivity
                 .setContentText("Bem-vindo ao ZOO!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
+                .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
+
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+
+        mChannel.setDescription(description);
+        mChannel.enableVibration(true);
+        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+        notificationManager.createNotificationChannel(mChannel);
+
+
+        notificationManager.notify(64647, mBuilder.build());
+
+        */
+    }
+
+    public void goToLocationTest (View v){
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
+                .setContentTitle("ZooZone")
+                .setContentText("Bem-vindo ao ZOO!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                .setAutoCancel(true);
+
+        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        //notificationIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(HomeActivity2.class);
+        stackBuilder.addNextIntent(notificationIntent);
+
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setContentIntent(resultPendingIntent);
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(64647, builder.build());
+
+    }
+
+    private void setupBeacons(){
+        EstimoteCloudCredentials cloudCredentials =
+                new EstimoteCloudCredentials("zoozone-how", "861b9e3dc034aa6c3a7afa2c51220271");
+
+        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        notificationIntent.putExtra("fromNotification",true);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(HomeActivity2.class);
+        stackBuilder.addNextIntent(notificationIntent);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Getting ready", Toast.LENGTH_SHORT);
+        toast.show();
+
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
+                .setContentTitle("ZooZone")
+                .setContentText("Bem-vindo ao ZOO!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                .setAutoCancel(true);
+
+        builder.setContentIntent(resultPendingIntent);
 
         final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
@@ -196,7 +291,7 @@ public class Main2Activity extends AppCompatActivity
                 dialog.dismiss();
                 //proximityHandler.stop();
                 //proximityHandler=null;
-                goToZooLocation();
+                //goToZooLocation();
             }
         });
         dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -223,15 +318,23 @@ public class Main2Activity extends AppCompatActivity
                         .build();
 
         ProximityZone zone1 = this.proximityObserver.zoneBuilder()
-                .forAttachmentKeyAndValue("floor", "1st")
+                .forAttachmentKeyAndValue("beacon_from", "zoo")
                 .inNearRange()
                 .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
                     @Override
                     public Unit invoke(ProximityAttachment attachment) {
-                        Log.d("beacon", "Welcome to the 1st floors");
+                        String zoo_location = "";
+                        if(attachment.hasAttachment()){
+                            zoo_location = attachment.getPayload().get("beacon_location");
+                        }
                         Toast toast = Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT);
                         toast.show();
-                        notificationManager.notify(64647, mBuilder.build());
+                        notificationManager.notify(64647, builder.build());
+
+                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+                        SharedPreferences.Editor editor=preferences.edit();
+                        editor.putString("zoo_location",zoo_location);
+                        editor.commit();
 
                         AlertDialog dialog = dialBuilder1.create();
                         dialog.show();
@@ -275,5 +378,9 @@ public class Main2Activity extends AppCompatActivity
                                 return null;
                             }
                         });
+
+
+        Toast toast1 = Toast.makeText(getApplicationContext(), "Everything ready", Toast.LENGTH_SHORT);
+        toast1.show();
     }
 }

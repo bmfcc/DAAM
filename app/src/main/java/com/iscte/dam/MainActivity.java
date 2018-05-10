@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
 
 
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, Main2Activity.class);
         //EditText editText = (EditText) findViewById(R.id.editText);
         //String message = editText.getText().toString();
         intent.putExtra(SELECTED_LANGUAGE, resourceName);
