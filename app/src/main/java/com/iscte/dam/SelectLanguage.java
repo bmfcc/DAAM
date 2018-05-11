@@ -7,15 +7,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+public class SelectLanguage extends AppCompatActivity {
 
-    public static final String SELECTED_LANGUAGE = "com.iscte.dam.MainActivity.LANGUAGE";
+    public static final String SELECTED_LANGUAGE = "com.iscte.dam.SelectLanguage.LANGUAGE";
     public static final String PREFS_NAME = "MyPrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.select_language);
     }
 
     public void selectLanguage(View view) {

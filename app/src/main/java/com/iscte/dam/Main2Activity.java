@@ -1,17 +1,13 @@
 package com.iscte.dam;
 
 import android.app.AlertDialog;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -25,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
@@ -159,22 +154,22 @@ public class Main2Activity extends AppCompatActivity
         int viewID = view.getId();
         String resourceName = getResources().getResourceEntryName(viewID);
         Log.d("MainAtivitityLog",resourceName);
-        Intent intent = new Intent(this, HomeActivity2.class);
+        Intent intent = new Intent(this, ZoneInfo.class);
         startActivity(intent);
     }
 
     public void selectLanguage(){
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, SelectLanguage.class);
         startActivity(intent);
     }
 
     public void goToZooLocation(View view){
-        /*Intent intent = new Intent(this, HomeActivity2.class);
+        /*Intent intent = new Intent(this, ZoneInfo.class);
         startActivity(intent);*/
 
         // Create an Intent for the activity you want to start
-        //Intent intent = new Intent(this, HomeActivity2.class);
-        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        //Intent intent = new Intent(this, ZoneInfo.class);
+        final Intent notificationIntent = new Intent(this, ZoneInfo.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -226,7 +221,7 @@ public class Main2Activity extends AppCompatActivity
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setAutoCancel(true);
 
-        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        final Intent notificationIntent = new Intent(this, ZoneInfo.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -234,7 +229,7 @@ public class Main2Activity extends AppCompatActivity
         //notificationIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(HomeActivity2.class);
+        stackBuilder.addParentStack(ZoneInfo.class);
         stackBuilder.addNextIntent(notificationIntent);
 
 
@@ -251,14 +246,14 @@ public class Main2Activity extends AppCompatActivity
         EstimoteCloudCredentials cloudCredentials =
                 new EstimoteCloudCredentials("zoozone-how", "861b9e3dc034aa6c3a7afa2c51220271");
 
-        final Intent notificationIntent = new Intent(this, HomeActivity2.class);
+        final Intent notificationIntent = new Intent(this, ZoneInfo.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         notificationIntent.putExtra("fromNotification",true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(HomeActivity2.class);
+        stackBuilder.addParentStack(ZoneInfo.class);
         stackBuilder.addNextIntent(notificationIntent);
 
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

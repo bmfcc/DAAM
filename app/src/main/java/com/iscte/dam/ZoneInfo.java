@@ -11,9 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,11 +19,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.MediaController;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizardFactory;
@@ -36,7 +31,6 @@ import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
 import com.estimote.proximity_sdk.proximity.ProximityZone;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 import kotlin.Unit;
@@ -44,7 +38,7 @@ import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 
 
-public class HomeActivity2 extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
+public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
 
     private ProximityObserver proximityObserver;
     private ProximityObserver.Handler proximityHandler = null;
@@ -58,7 +52,7 @@ public class HomeActivity2 extends AppCompatActivity implements SeekBar.OnSeekBa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home2);
+        setContentView(R.layout.zone_info);
 
         audioBuild();
         dostuff();
@@ -191,7 +185,7 @@ public class HomeActivity2 extends AppCompatActivity implements SeekBar.OnSeekBa
 
     public void dostuff(){
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.SELECTED_LANGUAGE);
+        String message = intent.getStringExtra(SelectLanguage.SELECTED_LANGUAGE);
 
         // Capture the layout's TextView and set the string as its text
         /*VideoView vidView = findViewById(R.id.videoView);
@@ -331,7 +325,7 @@ public class HomeActivity2 extends AppCompatActivity implements SeekBar.OnSeekBa
     }
 
     public void goToZooLocation(){
-        Intent intent = new Intent(this, HomeActivity2.class);
+        Intent intent = new Intent(this, ZoneInfo.class);
         startActivity(intent);
     }
 
