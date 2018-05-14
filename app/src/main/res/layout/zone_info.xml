@@ -34,13 +34,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageButton"
+        app:layout_constraintBottom_toBottomOf="@+id/animalImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
         app:layout_constraintVertical_bias="0.448" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/animalImage"
         android:layout_width="116dp"
         android:layout_height="128dp"
         android:layout_marginBottom="8dp"

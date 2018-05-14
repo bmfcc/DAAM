@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -43,17 +44,22 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private ProximityObserver proximityObserver;
     private ProximityObserver.Handler proximityHandler = null;
     private ImageButton startPlaying;
+    private ImageButton animalImage;
     private SeekBar seekBar;
     private MediaPlayer mPlayer = null;
     private String mFileName = null;
     private AssetFileDescriptor descriptor;
     public static final String PREFS_NAME = "MyPrefsFile";
+    private int resID;
+    private Handler handler;
+    private Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.zone_info);
 
+        imageBuild();
         audioBuild();
         dostuff();
     }
@@ -68,6 +74,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
                 SharedPreferences.Editor editor=preferences.edit();
                 editor.putString("activityFromNotification","true");
                 editor.commit();
+                mPlayer.stop();
                 break;
         }
         return true;
@@ -80,31 +87,71 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         SharedPreferences.Editor editor=preferences.edit();
         editor.putString("activityFromNotification","true");
         editor.commit();
+
+        mPlayer.stop();
+    }
+
+    private void imageBuild(){
+        animalImage = findViewById(R.id.animalImage);
+
+        //animalImage.setImageResource();
+
     }
 
     private void audioBuild(){
         startPlaying = (ImageButton) findViewById(R.id.buttonStartPlay);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
+        handler = new Handler();
 
-        //Corrigir
-        /*mFileName = Environment.getExternalStorageDirectory().getAbsolutePath()//;
-        mFileName += "/audiorecordtest.3gp";
-*/
-        Log.e("audioBuild", "startPlaying-> " + startPlaying);
-        /*startPlaying.setOnClickListener(new View.OnClickListener() {
-            boolean mStartPlaying = true;
+        resID =getResources().getIdentifier("foca_comum", "raw", getPackageName());
+        mPlayer = MediaPlayer.create(this,resID);
+
+        seekBar.setMax(mPlayer.getDuration());
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onClick(View v) {
-                //onPlay(mStartPlaying);
-                startAudio();
-                if (mStartPlaying) {
-                    startPlaying.setImageResource(R.drawable.ic_media_pause);
-                } else {
-                    startPlaying.setImageResource(R.drawable.ic_media_play);
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    Toast toastPause = Toast.makeText(getApplicationContext(), "from user", Toast.LENGTH_SHORT);
+                    toastPause.show();
+                    mPlayer.seekTo(progress);
                 }
-                mStartPlaying = !mStartPlaying;
             }
-        });*/
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                startPlaying.setImageResource((R.drawable.ic_media_play));
+                mPlayer.seekTo(0);
+                seekBar.setProgress(0);
+            }
+        });
+    }
+
+    public void playCycle(){
+        seekBar.setProgress(mPlayer.getCurrentPosition());
+
+        if(mPlayer.isPlaying()){
+            Log.e("playCycle","isplaying");
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    playCycle();
+                }
+            };
+            handler.postDelayed(runnable,1000);
+        }
     }
 
     public void startAudio(View view) {
@@ -121,12 +168,14 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mPlayer.start();
             ((ImageButton)view).setImageResource(R.drawable.ic_media_pause);
             //startPlaying.setImageResource(R.drawable.ic_media_pause);
+            playCycle();
+
         }else{
             Toast toastNew = Toast.makeText(getApplicationContext(), "NEW", Toast.LENGTH_SHORT);
             toastNew.show();
-            int resID =getResources().getIdentifier("foca_comum", "raw", getPackageName());
+
             Log.e("startAudio", "failed -> " + resID);
-            mPlayer = MediaPlayer.create(this,resID);
+
             try {
                 //descriptor = getAssets().openFd("foca_comum.ogg");
                 //mPlayer.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
@@ -173,6 +222,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         super.onDestroy();
         Toast toast = Toast.makeText(getApplicationContext(), "DESTROYYYYYYYY", Toast.LENGTH_SHORT);
         toast.show();
+        mPlayer.release();
+        handler.removeCallbacks(runnable);
     }
 
     @Override
@@ -216,117 +267,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             e.printStackTrace();
         }
         mp.start();*/
-    }
-
-    private void setupBeacons(){
-        EstimoteCloudCredentials cloudCredentials =
-                new EstimoteCloudCredentials("zoozone-how", "861b9e3dc034aa6c3a7afa2c51220271");
-
-        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "testing_notification")
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle("ZooZone")
-                .setContentText("Bem-vindo ao ZOO!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-
-        final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        final AlertDialog.Builder diagBuilder = new AlertDialog.Builder(this);
-        diagBuilder.setMessage("Welcome to the XXX Zone! Do you wanna know more?")
-                .setTitle("XXX Zone");
-        diagBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
-                Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-                proximityHandler.stop();
-                proximityHandler = null;
-                goToZooLocation();
-            }
-        });
-        diagBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-                Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-            }
-        });
-
-        this.proximityObserver =
-                new ProximityObserverBuilder(getApplicationContext(), cloudCredentials)
-                        .withOnErrorAction(new Function1<Throwable, Unit>() {
-                            @Override
-                            public Unit invoke(Throwable throwable) {
-                                Log.e("app", "proximity observer error: " + throwable);
-                                return null;
-                            }
-                        })
-                        .withBalancedPowerMode()
-                        .withEstimoteSecureMonitoringDisabled()
-                        .withTelemetryReportingDisabled()
-                        .build();
-
-        ProximityZone zone1 = this.proximityObserver.zoneBuilder()
-                .forAttachmentKeyAndValue("floor", "1st")
-                .inNearRange()
-                .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
-                    @Override
-                    public Unit invoke(ProximityAttachment attachment) {
-                        Log.d("beacon", "Welcome to the 1st floors");
-                        Toast toast = Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT);
-                        toast.show();
-                        notificationManager.notify(64647,mBuilder.build());
-
-                        AlertDialog dialog = diagBuilder.create();
-                        dialog.show();
-                        return null;
-                    }
-                })
-                .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
-                    @Override
-                    public Unit invoke(ProximityAttachment attachment) {
-                        Log.d("beacon", "Bye bye, come visit us again on the 1st floor");
-                        Toast toast = Toast.makeText(getApplicationContext(), "Byeee", Toast.LENGTH_SHORT);
-                        toast.show();
-                        return null;
-                    }
-                })
-                .create();
-        this.proximityObserver.addProximityZone(zone1);
-
-        RequirementsWizardFactory
-                .createEstimoteRequirementsWizard()
-                .fulfillRequirements(this,
-                        // onRequirementsFulfilled
-                        new Function0<Unit>() {
-                            @Override public Unit invoke() {
-                                Log.d("app", "requirements fulfilled");
-                                proximityHandler = proximityObserver.start();
-                                return null;
-                            }
-                        },
-                        // onRequirementsMissing
-                        new Function1<List<? extends Requirement>, Unit>() {
-                            @Override public Unit invoke(List<? extends Requirement> requirements) {
-                                Log.e("app", "requirements missing: " + requirements);
-                                return null;
-                            }
-                        },
-                        // onError
-                        new Function1<Throwable, Unit>() {
-                            @Override public Unit invoke(Throwable throwable) {
-                                Log.e("app", "requirements error: " + throwable);
-                                return null;
-                            }
-                        });
-    }
-
-    public void goToZooLocation(){
-        Intent intent = new Intent(this, ZoneInfo.class);
-        startActivity(intent);
     }
 
 }
