@@ -46,6 +46,7 @@ public class Main2Activity extends AppCompatActivity
     protected String name = "my_package_channel";
     protected String description = "my_package_first_channel";
     protected int importance = NotificationManager.IMPORTANCE_HIGH;
+    private String zoneID = null;
 
     public static final String PREFS_NAME = "MyPrefsFile";
 
@@ -73,18 +74,18 @@ public class Main2Activity extends AppCompatActivity
             finish();
         }else {
 
-            String fromNotification = preferences.getString("activityFromNotification", "Default");
+            String setupBeacons = preferences.getString("setupBeacons", "Default");
+            Log.e("TESTINGGGGGGGG", setupBeacons);
 
-            if(fromNotification.equals("Default") || fromNotification.equals("false")) {
+            if(setupBeacons.equals("Default") || setupBeacons.equals("true")) {
                 Toast toast = Toast.makeText(getApplicationContext(), "Let's START!", Toast.LENGTH_SHORT);
                 toast.show();
                 setupBeacons();
-            }else{
+
                 SharedPreferences.Editor editor=preferences.edit();
-                editor.putString("activityFromNotification","false");
+                editor.putString("setupBeacons","false");
                 editor.commit();
             }
-
         }
     }
 
@@ -98,14 +99,14 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main2, menu);
         return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -118,7 +119,7 @@ public class Main2Activity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -126,9 +127,12 @@ public class Main2Activity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_language) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            Intent intent = new Intent(this, SelectLanguage.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_myZone) {
+            getMyZone();
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -240,6 +244,8 @@ public class Main2Activity extends AppCompatActivity
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(64647, builder.build());
 
+        zoneID = "foca-comum";
+
     }
 
     private void setupBeacons(){
@@ -274,30 +280,6 @@ public class Main2Activity extends AppCompatActivity
 
         final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        //Alerta para a Primeira Atividade
-        final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
-        dialBuilder1.setMessage("Welcome to the XXX Zone! Do you wanna know more?")
-                .setTitle("XXX Zone");
-        dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
-                Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-                //proximityHandler.stop();
-                //proximityHandler=null;
-                //goToZooLocation();
-            }
-        });
-        dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-                Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-            }
-        });
-
         this.proximityObserver =
                 new ProximityObserverBuilder(getApplicationContext(), cloudCredentials)
                         .withOnErrorAction(new Function1<Throwable, Unit>() {
@@ -331,8 +313,6 @@ public class Main2Activity extends AppCompatActivity
                         editor.putString("zoo_location",zoo_location);
                         editor.commit();
 
-                        AlertDialog dialog = dialBuilder1.create();
-                        dialog.show();
                         return null;
                     }
                 })
@@ -377,5 +357,34 @@ public class Main2Activity extends AppCompatActivity
 
         Toast toast1 = Toast.makeText(getApplicationContext(), "Everything ready", Toast.LENGTH_SHORT);
         toast1.show();
+    }
+
+    private void getMyZone(){
+        //Alerta para a Primeira Atividade
+        final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
+        dialBuilder1.setMessage("You are in " + zoneID + " Zone! Do you wanna know more?")
+                .setTitle("My Zone");
+        dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
+                toast.show();
+                dialog.dismiss();
+                //proximityHandler.stop();
+                //proximityHandler=null;
+                //goToZooLocation();
+            }
+        });
+        dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
+                toast.show();
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = dialBuilder1.create();
+        dialog.show();
     }
 }

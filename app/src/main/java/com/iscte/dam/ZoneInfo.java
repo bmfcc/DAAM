@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -44,7 +45,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private ProximityObserver proximityObserver;
     private ProximityObserver.Handler proximityHandler = null;
     private ImageButton startPlaying;
-    private ImageButton animalImage;
+    private ImageView animalImage;
     private SeekBar seekBar;
     private MediaPlayer mPlayer = null;
     private String mFileName = null;
@@ -85,7 +86,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         super.onBackPressed();
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         SharedPreferences.Editor editor=preferences.edit();
-        editor.putString("activityFromNotification","true");
+        editor.putString("setupBeacons","false");
         editor.commit();
 
         mPlayer.stop();
@@ -94,7 +95,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private void imageBuild(){
         animalImage = findViewById(R.id.animalImage);
 
-        //animalImage.setImageResource();
+        animalImage.setImageResource(R.drawable.foca_comum);
 
     }
 
