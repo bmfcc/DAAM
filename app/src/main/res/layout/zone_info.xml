@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textViewDesc"
         android:layout_width="351dp"
         android:layout_height="281dp"
         android:layout_marginBottom="8dp"
@@ -39,8 +39,8 @@
 
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
-        app:layout_constraintEnd_toEndOf="@+id/textView2"
+        app:layout_constraintBottom_toTopOf="@+id/textViewDesc"
+        app:layout_constraintEnd_toEndOf="@+id/textViewDesc"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/animalImage" />
 
@@ -56,7 +56,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/seekBar"
         app:layout_constraintEnd_toStartOf="@+id/seekBar"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintStart_toStartOf="@+id/textViewDesc"
         app:layout_constraintTop_toTopOf="@+id/seekBar"
         app:layout_constraintVertical_bias="0.727"
         app:srcCompat="@android:drawable/ic_media_play" />

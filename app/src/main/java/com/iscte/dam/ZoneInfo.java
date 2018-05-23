@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
@@ -31,6 +32,12 @@ import com.estimote.proximity_sdk.proximity.ProximityAttachment;
 import com.estimote.proximity_sdk.proximity.ProximityObserver;
 import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
 import com.estimote.proximity_sdk.proximity.ProximityZone;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.iscte.dam.models.Zone;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,6 +53,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private ProximityObserver.Handler proximityHandler = null;
     private ImageButton startPlaying;
     private ImageView animalImage;
+    private TextView tView;
     private SeekBar seekBar;
     private MediaPlayer mPlayer = null;
     private String mFileName = null;
@@ -55,14 +63,26 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private Handler handler;
     private Runnable runnable;
 
+    private Zone zone = null;
+
+    private DatabaseReference myRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.zone_info);
 
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+        String stringZone = preferences.getString("zoo_location", "foca_comum");
+
+        Log.w("TESTBD",stringZone);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("Zones").child(stringZone);
+
         imageBuild();
         audioBuild();
-        dostuff();
+        textBuild();
     }
 
     @Override
@@ -235,39 +255,38 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         toast.show();
     }
 
-    public void dostuff(){
+    public void textBuild(){
         Intent intent = getIntent();
         String message = intent.getStringExtra(SelectLanguage.SELECTED_LANGUAGE);
 
-        // Capture the layout's TextView and set the string as its text
-        /*VideoView vidView = findViewById(R.id.videoView);
-        vidView.setMediaController(new MediaController(this));
-        vidView.setVideoURI(Uri.parse(path+"/"+fileName));
-        //vidView.requestFocus();
-        vidView.start();
+        tView = (TextView) findViewById(R.id.textViewDesc);
 
-        /*try {
-            mp.setDataSource(path+"/"+fileName);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            mp.prepare();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        mp.start();*/
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                for(DataSnapshot data: dataSnapshot.getChildren()){
+
+                    zone = dataSnapshot.getValue(Zone.class);
+                }
+
+                Log.w("TESTBD", zone.getDescription());
+
+                tView.setText(zone.getDescription());
+                // ...
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("GetBDValueError", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        myRef.addListenerForSingleValueEvent(postListener);
+
+
     }
 
 }

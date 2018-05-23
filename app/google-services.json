@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1013675250346",
+    "firebase_url": "https://zoozonefirebase-efa6c.firebaseio.com",
+    "project_id": "zoozonefirebase-efa6c",
+    "storage_bucket": "zoozonefirebase-efa6c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013675250346:android:b6c83c5a9e74eedc",
+        "android_client_info": {
+          "package_name": "com.iscte.dam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013675250346-svse7dm22v0lrbmhopackeribsk0iera.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iscte.dam",
+            "certificate_hash": "fed09be9eaf2c6cca8e4ab0768d77b8571e47085"
+          }
+        },
+        {
+          "client_id": "1013675250346-232junp69ek40qgp0qpj9qc03n6lmprd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkM9Y6qdALqYIzstCqTsfx52EMBtn9_a8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013675250346-232junp69ek40qgp0qpj9qc03n6lmprd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
