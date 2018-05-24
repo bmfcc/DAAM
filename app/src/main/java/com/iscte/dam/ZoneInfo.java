@@ -10,7 +10,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
@@ -25,6 +27,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizardFactory;
 import com.estimote.proximity_sdk.proximity.EstimoteCloudCredentials;
@@ -32,11 +35,14 @@ import com.estimote.proximity_sdk.proximity.ProximityAttachment;
 import com.estimote.proximity_sdk.proximity.ProximityObserver;
 import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
 import com.estimote.proximity_sdk.proximity.ProximityZone;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.iscte.dam.models.Zone;
 
 import java.io.IOException;
@@ -53,7 +59,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private ProximityObserver.Handler proximityHandler = null;
     private ImageButton startPlaying;
     private ImageView animalImage;
-    private TextView tView;
+    private TextView tViewDesc;
+    private TextView tViewTitle;
     private SeekBar seekBar;
     private MediaPlayer mPlayer = null;
     private String mFileName = null;
@@ -65,7 +72,12 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
     private Zone zone = null;
 
-    private DatabaseReference myRef;
+    private DatabaseReference dbRef;
+
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
+    private StorageReference imagesRef;
+    private StorageReference audioRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +90,14 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         Log.w("TESTBD",stringZone);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("Zones").child(stringZone);
+        dbRef = database.getReference("Zones").child(stringZone);
 
-        imageBuild();
-        audioBuild();
-        textBuild();
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+        imagesRef = storageRef.child("Images");
+        audioRef = storageRef.child("Audios");
+
+        getDBInfo();
     }
 
     @Override
@@ -115,7 +130,11 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private void imageBuild(){
         animalImage = findViewById(R.id.animalImage);
 
-        animalImage.setImageResource(R.drawable.foca_comum);
+        StorageReference imageReference = imagesRef.child(zone.getImageFile());
+
+        Log.w("TESTSTORAGE",imageReference.getPath());
+
+        GlideApp.with(this).load(imageReference).into(animalImage);
 
     }
 
@@ -124,10 +143,45 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         handler = new Handler();
 
-        resID =getResources().getIdentifier("foca_comum", "raw", getPackageName());
-        mPlayer = MediaPlayer.create(this,resID);
+        //resID =getResources().getIdentifier("foca_comum", "raw", getPackageName());
+        //mPlayer = MediaPlayer.create(this,resID);
 
-        seekBar.setMax(mPlayer.getDuration());
+        mPlayer = new MediaPlayer();
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        StorageReference audioReference = audioRef.child(zone.getAudioFile());
+
+        audioReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                try {
+                    // Download url of file
+                    String url = uri.toString();
+                    mPlayer.setDataSource(url);
+                    mPlayer.prepare();
+                    seekBar.setMax(mPlayer.getDuration());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        /*mPlayer = new MediaPlayer();
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mPlayer.setDataSource(audioReference.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+        /*try {
+            mPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        //seekBar.setMax(mPlayer.getDuration());
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -256,24 +310,29 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     }
 
     public void textBuild(){
-        Intent intent = getIntent();
-        String message = intent.getStringExtra(SelectLanguage.SELECTED_LANGUAGE);
 
-        tView = (TextView) findViewById(R.id.textViewDesc);
+        tViewTitle = (TextView) findViewById(R.id.textViewTitle);
+
+        tViewTitle.setText(zone.getName());
+
+        tViewDesc = (TextView) findViewById(R.id.textViewDesc);
+
+        tViewDesc.setText(zone.getDescription());
+
+    }
+
+    private void getDBInfo(){
 
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
 
-                for(DataSnapshot data: dataSnapshot.getChildren()){
+                zone = dataSnapshot.getValue(Zone.class);
 
-                    zone = dataSnapshot.getValue(Zone.class);
-                }
-
-                Log.w("TESTBD", zone.getDescription());
-
-                tView.setText(zone.getDescription());
+                imageBuild();
+                audioBuild();
+                textBuild();
                 // ...
             }
 
@@ -284,9 +343,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
                 // ...
             }
         };
-        myRef.addListenerForSingleValueEvent(postListener);
-
-
+        dbRef.addListenerForSingleValueEvent(postListener);
     }
 
 }

@@ -5,17 +5,19 @@ package com.iscte.dam.models;
  */
 
 public class Zone {
-    public String name;
-    public String id;
-    public String audioFile;
-    public String description;
+    private String name;
+    private String id;
+    private String audioFile;
+    private String description;
+    private String imageFile;
 
     public Zone(){}
 
-    public Zone(String name, String id, String audioFile, String description){
+    public Zone(String name, String id, String audioFile, String imageFile, String description){
         this.name=name;
         this.id=id;
         this.audioFile=audioFile;
+        this.imageFile = imageFile;
         this.description=description;
     }
 
@@ -50,4 +52,13 @@ public class Zone {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
+    }
+
 }
