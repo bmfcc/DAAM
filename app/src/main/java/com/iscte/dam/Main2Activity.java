@@ -68,6 +68,7 @@ public class Main2Activity extends AppCompatActivity
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         String language = preferences.getString("selected_language", "Default");
+        Log.w("TestLanguage", language);
 
         if(language.equals("Default")){
             selectLanguage();
@@ -362,27 +363,41 @@ public class Main2Activity extends AppCompatActivity
     private void getMyZone(){
         //Alerta para a Primeira Atividade
         final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
-        dialBuilder1.setMessage("You are in " + zoneID + " Zone! Do you wanna know more?")
-                .setTitle("My Zone");
-        dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
-                Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-                //proximityHandler.stop();
-                //proximityHandler=null;
-                //goToZooLocation();
-            }
-        });
-        dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-                Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
-                toast.show();
-                dialog.dismiss();
-            }
-        });
+
+        if(zoneID!=null) {
+            dialBuilder1.setMessage("You are in " + zoneID + " Zone! Do you wanna know more?")
+                    .setTitle("My Zone");
+            dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User clicked OK button
+                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
+                    toast.show();
+                    dialog.dismiss();
+                    //proximityHandler.stop();
+                    //proximityHandler=null;
+                    //goToZooLocation();
+                }
+            });
+            dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                    Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
+                    toast.show();
+                    dialog.dismiss();
+                }
+            });
+        } else{
+            dialBuilder1.setMessage("You have not passed any of our zones yet")
+                    .setTitle("My Zone");
+            dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User clicked OK button
+                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
+                    toast.show();
+                    dialog.dismiss();
+                }
+            });
+        }
 
         AlertDialog dialog = dialBuilder1.create();
         dialog.show();

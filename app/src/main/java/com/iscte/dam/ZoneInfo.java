@@ -86,16 +86,15 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         String stringZone = preferences.getString("zoo_location", "foca_comum");
-
-        Log.w("TESTBD",stringZone);
+        String language = preferences.getString("selected_language","EN");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        dbRef = database.getReference("Zones").child(stringZone);
+        dbRef = database.getReference("Zones").child(language+"/"+stringZone);
 
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         imagesRef = storageRef.child("Images");
-        audioRef = storageRef.child("Audios");
+        audioRef = storageRef.child("Audios/"+language);
 
         getDBInfo();
     }
