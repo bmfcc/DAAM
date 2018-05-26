@@ -85,8 +85,32 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         setContentView(R.layout.zone_info);
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-        String stringZone = preferences.getString("zoo_location", "foca_comum");
-        String language = preferences.getString("selected_language","EN");
+
+        String stringZone = preferences.getString("zoo_location", "Default");
+
+        if(stringZone == "Default"){
+            Toast toast = Toast.makeText(getApplicationContext(), "Zone not found!", Toast.LENGTH_SHORT);
+            toast.show();
+            finish();
+        }
+
+        String language = preferences.getString("selected_language","Default");
+
+        if(language == "Default"){
+            final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
+            dialBuilder1.setMessage("Language not choosed! Information displayed will appear in English.")
+                    .setTitle("My Zone");
+            dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User clicked OK button
+                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
+                    toast.show();
+                    dialog.dismiss();
+                }
+            });
+            language="EN";
+        }
+
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbRef = database.getReference("Zones").child(language+"/"+stringZone);
@@ -105,10 +129,12 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             case android.R.id.home:
                 Toast.makeText(getApplicationContext(),"Back button clicked", Toast.LENGTH_SHORT).show();
                 super.onBackPressed();
-                SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-                SharedPreferences.Editor editor=preferences.edit();
-                editor.putString("activityFromNotification","true");
-                editor.commit();
+
+                //SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+                //SharedPreferences.Editor editor=preferences.edit();
+
+                //editor.putString("setupBeacons","false");
+                //editor.commit();
                 mPlayer.stop();
                 break;
         }
@@ -118,10 +144,11 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-        SharedPreferences.Editor editor=preferences.edit();
-        editor.putString("setupBeacons","false");
-        editor.commit();
+        //SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+        //SharedPreferences.Editor editor=preferences.edit();
+
+        //editor.putString("setupBeacons","false");
+        //editor.commit();
 
         mPlayer.stop();
     }

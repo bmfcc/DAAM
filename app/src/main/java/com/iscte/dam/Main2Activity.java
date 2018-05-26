@@ -75,19 +75,22 @@ public class Main2Activity extends AppCompatActivity
             finish();
         }else {
 
-            String setupBeacons = preferences.getString("setupBeacons", "Default");
-            Log.e("TESTINGGGGGGGG", setupBeacons);
+            String setupBeacons = SetupBeacons.getInstance().getSetupBeacons();
 
-            if(setupBeacons.equals("Default") || setupBeacons.equals("true")) {
+            if(setupBeacons.equals("True")) {
                 Toast toast = Toast.makeText(getApplicationContext(), "Let's START!", Toast.LENGTH_SHORT);
                 toast.show();
                 setupBeacons();
 
-                SharedPreferences.Editor editor=preferences.edit();
-                editor.putString("setupBeacons","false");
-                editor.commit();
+                SetupBeacons.getInstance().setSetupBeacons("False");
             }
+
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
     }
 
     @Override
@@ -245,8 +248,6 @@ public class Main2Activity extends AppCompatActivity
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(64647, builder.build());
 
-        zoneID = "foca-comum";
-
     }
 
     private void setupBeacons(){
@@ -257,7 +258,6 @@ public class Main2Activity extends AppCompatActivity
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        notificationIntent.putExtra("fromNotification",true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ZoneInfo.class);
@@ -320,7 +320,6 @@ public class Main2Activity extends AppCompatActivity
                 .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
                     @Override
                     public Unit invoke(ProximityAttachment attachment) {
-                        Log.d("beacon", "Bye bye, come visit us again on the 1st floor");
                         Toast toast = Toast.makeText(getApplicationContext(), "Byeee", Toast.LENGTH_SHORT);
                         toast.show();
                         return null;
@@ -363,9 +362,13 @@ public class Main2Activity extends AppCompatActivity
     private void getMyZone(){
         //Alerta para a Primeira Atividade
         final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
+        final Intent zoneIntent = new Intent(this, ZoneInfo.class);
 
-        if(zoneID!=null) {
-            dialBuilder1.setMessage("You are in " + zoneID + " Zone! Do you wanna know more?")
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+        zoneID =  preferences.getString("zoo_location", "Default");
+
+        if(zoneID!="Default") {
+            dialBuilder1.setMessage("Your last zone was: " + zoneID + "! Do you wanna know more?")
                     .setTitle("My Zone");
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -373,9 +376,7 @@ public class Main2Activity extends AppCompatActivity
                     Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
                     toast.show();
                     dialog.dismiss();
-                    //proximityHandler.stop();
-                    //proximityHandler=null;
-                    //goToZooLocation();
+                    startActivity(zoneIntent);
                 }
             });
             dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -392,8 +393,6 @@ public class Main2Activity extends AppCompatActivity
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
-                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                 }
             });

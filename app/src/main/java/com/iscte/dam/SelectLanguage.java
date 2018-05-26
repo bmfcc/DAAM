@@ -31,9 +31,7 @@ public class SelectLanguage extends AppCompatActivity {
 
 
         Intent intent = new Intent(this, Main2Activity.class);
-        //EditText editText = (EditText) findViewById(R.id.editText);
-        //String message = editText.getText().toString();
-        intent.putExtra(SELECTED_LANGUAGE, resourceName);
         startActivity(intent);
+        finish();
     }
 }
