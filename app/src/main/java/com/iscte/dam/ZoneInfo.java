@@ -92,6 +92,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             Toast toast = Toast.makeText(getApplicationContext(), "Zone not found!", Toast.LENGTH_SHORT);
             toast.show();
             finish();
+            return;
         }
 
         String language = preferences.getString("selected_language","Default");
@@ -323,8 +324,11 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         super.onDestroy();
         Toast toast = Toast.makeText(getApplicationContext(), "DESTROYYYYYYYY", Toast.LENGTH_SHORT);
         toast.show();
-        mPlayer.release();
-        handler.removeCallbacks(runnable);
+
+        if(mPlayer!=null) {
+            mPlayer.release();
+            handler.removeCallbacks(runnable);
+        }
     }
 
     @Override
