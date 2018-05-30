@@ -36,6 +36,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 
     implementation 'com.firebaseui:firebase-ui-storage:3.2.1'
+
+    implementation 'me.relex:circleindicator:1.2.2@aar'
 }
 
 

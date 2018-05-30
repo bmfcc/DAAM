@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,6 +88,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
 
         String stringZone = preferences.getString("zoo_location", "Default");
+
+        stringZone = "foca_comum";
 
         if(stringZone == "Default"){
             Toast toast = Toast.makeText(getApplicationContext(), "Zone not found!", Toast.LENGTH_SHORT);
@@ -348,6 +351,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         tViewDesc = (TextView) findViewById(R.id.textViewDesc);
 
         tViewDesc.setText(zone.getDescription());
+        tViewDesc.setMovementMethod(new ScrollingMovementMethod());
 
     }
 

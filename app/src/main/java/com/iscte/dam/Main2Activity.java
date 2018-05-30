@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -30,12 +32,22 @@ import com.estimote.proximity_sdk.proximity.ProximityAttachment;
 import com.estimote.proximity_sdk.proximity.ProximityObserver;
 import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
 import com.estimote.proximity_sdk.proximity.ProximityZone;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.iscte.dam.models.Zone;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
+import me.relex.circleindicator.CircleIndicator;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,23 +60,34 @@ public class Main2Activity extends AppCompatActivity
     protected int importance = NotificationManager.IMPORTANCE_HIGH;
     private String zoneID = null;
 
+    private DatabaseReference dbImagesRef;
+    private ArrayList<String> slidingImages;
+    private static ViewPager mPager;
+    private static int currentPage = 0;
+
     public static final String PREFS_NAME = "MyPrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.textColorPrimary));
+        toolbar.setSubtitleTextColor(getResources().getColor(R.color.textColorPrimary));
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColorPrimary));
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        setSlider();
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         String language = preferences.getString("selected_language", "Default");
@@ -400,5 +423,59 @@ public class Main2Activity extends AppCompatActivity
 
         AlertDialog dialog = dialBuilder1.create();
         dialog.show();
+    }
+
+    private void setSlider() {
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        dbImagesRef = database.getReference("SlidingImages");
+
+        getDBInfo();
+
+        // Auto start of viewpager
+        final Handler handler = new Handler();
+        final Runnable Update = new Runnable() {
+            public void run() {
+                if (currentPage == slidingImages.size()) {
+                    currentPage = 0;
+                }
+                mPager.setCurrentItem(currentPage++, true);
+            }
+        };
+        Timer swipeTimer = new Timer();
+        swipeTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(Update);
+            }
+        }, 10000, 20000);
+    }
+
+    private void getDBInfo(){
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                slidingImages = (ArrayList<String>) dataSnapshot.getValue();
+                Log.w("SLIDEEEE",slidingImages.get(0));
+
+
+                mPager = (ViewPager) findViewById(R.id.pager);
+                mPager.setAdapter(new Adapter(Main2Activity.this,slidingImages));
+                CircleIndicator indicator = (CircleIndicator) findViewById(R.id.indicator);
+                indicator.setViewPager(mPager);
+                // ...
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("GetBDValueError", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        dbImagesRef.addListenerForSingleValueEvent(postListener);
     }
 }
