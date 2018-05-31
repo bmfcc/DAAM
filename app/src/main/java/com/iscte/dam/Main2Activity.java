@@ -158,10 +158,11 @@ public class Main2Activity extends AppCompatActivity
             // Handle the camera action
             Intent intent = new Intent(this, SelectLanguage.class);
             startActivity(intent);
+            finish();
         } else if (id == R.id.nav_myZone) {
             getMyZone();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_home) {
 
         } else if (id == R.id.nav_manage) {
 

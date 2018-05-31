@@ -5,6 +5,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_action_home"
+            android:title="Home" />
+        <item
             android:id="@+id/nav_language"
             android:icon="@drawable/language"
             android:title="Language" />
@@ -12,10 +16,6 @@
             android:id="@+id/nav_myZone"
             android:icon="@drawable/ic_stat_name"
             android:title="Get My Zone" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
