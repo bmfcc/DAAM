@@ -2,18 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.iscte.dam">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_final_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_final_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".Main2Activity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +25,14 @@
         <activity
             android:name=".ZoneInfo"
             android:parentActivityName=".Main2Activity" />
-
+        <activity
+            android:name=".NewsRV"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".NewsView"
+            android:parentActivityName=".NewsRV">
+        </activity>
     </application>
 
 </manifest>

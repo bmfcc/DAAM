@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -21,8 +22,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
@@ -37,7 +38,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.iscte.dam.models.Zone;
+import com.iscte.dam.models.History;
+import com.iscte.dam.models.Menu;
+import com.iscte.dam.models.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +59,19 @@ public class Main2Activity extends AppCompatActivity
     private ProximityObserver.Handler proximityHandler = null;
     private String CHANNEL_ID = "notification_channelID";
     protected String name = "my_package_channel";
-    protected String description = "my_package_first_channel";
-    protected int importance = NotificationManager.IMPORTANCE_HIGH;
     private String zoneID = null;
+    private String language;
+
+    private String zoneNotFound = "You have not passed any of our zones yet";
+    private String zoneFound = "Your last zone was: zoneID! Do you wanna know more?";
+    private String msgZoneTitle = "My Zone";
+    private String notificationMsg = "Welcome to Zone zoneID!";
 
     private DatabaseReference dbImagesRef;
+    private DatabaseReference dbHistoryRef;
+    private DatabaseReference dbMenuRef;
+    private DatabaseReference dbMessagesRef;
+
     private ArrayList<String> slidingImages;
     private static ViewPager mPager;
     private static int currentPage = 0;
@@ -87,16 +98,15 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setSlider();
-
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-        String language = preferences.getString("selected_language", "Default");
+        language = preferences.getString("selected_language", "Default");
         Log.w("TestLanguage", language);
 
         if(language.equals("Default")){
             selectLanguage();
             finish();
         }else {
+            setSlider();
 
             String setupBeacons = SetupBeacons.getInstance().getSetupBeacons();
 
@@ -164,11 +174,13 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_home) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_news) {
+            Intent intent = new Intent(this, NewsRV.class);
+            startActivity(intent);
+            finish();
+        } else if (id == R.id.nav_report) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_classify) {
 
         }
 
@@ -248,7 +260,7 @@ public class Main2Activity extends AppCompatActivity
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
                 .setContentTitle("ZooZone")
-                .setContentText("Bem-vindo ao ZOO!")
+                .setContentText("Bem-vindo à Zona do Leão!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setAutoCancel(true);
@@ -296,7 +308,6 @@ public class Main2Activity extends AppCompatActivity
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
                 .setContentTitle("ZooZone")
-                .setContentText("Bem-vindo ao ZOO!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setAutoCancel(true);
@@ -310,7 +321,7 @@ public class Main2Activity extends AppCompatActivity
                         .withOnErrorAction(new Function1<Throwable, Unit>() {
                             @Override
                             public Unit invoke(Throwable throwable) {
-                                Log.e("app", "proximity observer error: " + throwable);
+                                Log.e("app_beacons", "proximity observer error: " + throwable);
                                 return null;
                             }
                         })
@@ -326,16 +337,22 @@ public class Main2Activity extends AppCompatActivity
                     @Override
                     public Unit invoke(ProximityAttachment attachment) {
                         String zoo_location = "";
+                        String zoo_location_desc = "";
                         if(attachment.hasAttachment()){
                             zoo_location = attachment.getPayload().get("beacon_location");
+                            zoo_location_desc = attachment.getPayload().get("beacon_location_desc");
                         }
                         Toast toast = Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT);
                         toast.show();
+                        builder.setContentText(notificationMsg.replace("zoneID",zoo_location_desc));
                         notificationManager.notify(64647, builder.build());
+
+                        Log.d("app_beacons", "Entrei");
 
                         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
                         SharedPreferences.Editor editor=preferences.edit();
                         editor.putString("zoo_location",zoo_location);
+                        editor.putString("zoo_location_desc",zoo_location_desc);
                         editor.commit();
 
                         return null;
@@ -358,7 +375,7 @@ public class Main2Activity extends AppCompatActivity
                         // onRequirementsFulfilled
                         new Function0<Unit>() {
                             @Override public Unit invoke() {
-                                Log.d("app", "requirements fulfilled");
+                                Log.d("app_beacons", "requirements fulfilled");
                                 proximityHandler = proximityObserver.start();
                                 return null;
                             }
@@ -366,14 +383,14 @@ public class Main2Activity extends AppCompatActivity
                         // onRequirementsMissing
                         new Function1<List<? extends Requirement>, Unit>() {
                             @Override public Unit invoke(List<? extends Requirement> requirements) {
-                                Log.e("app", "requirements missing: " + requirements);
+                                Log.e("app_beacons", "requirements missing: " + requirements);
                                 return null;
                             }
                         },
                         // onError
                         new Function1<Throwable, Unit>() {
                             @Override public Unit invoke(Throwable throwable) {
-                                Log.e("app", "requirements error: " + throwable);
+                                Log.e("app_beacons", "requirements error: " + throwable);
                                 return null;
                             }
                         });
@@ -390,10 +407,11 @@ public class Main2Activity extends AppCompatActivity
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         zoneID =  preferences.getString("zoo_location", "Default");
+        String zone_desc = preferences.getString("zoo_location_desc","Default");
 
-        if(zoneID!="Default") {
-            dialBuilder1.setMessage("Your last zone was: " + zoneID + "! Do you wanna know more?")
-                    .setTitle("My Zone");
+        if(zone_desc!="Default") {
+            dialBuilder1.setMessage(zoneFound.replace("zoneID",zone_desc))
+                    .setTitle(msgZoneTitle);
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
@@ -412,8 +430,8 @@ public class Main2Activity extends AppCompatActivity
                 }
             });
         } else{
-            dialBuilder1.setMessage("You have not passed any of our zones yet")
-                    .setTitle("My Zone");
+            dialBuilder1.setMessage(zoneNotFound)
+                    .setTitle(msgZoneTitle);
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
@@ -428,33 +446,41 @@ public class Main2Activity extends AppCompatActivity
 
     private void setSlider() {
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        dbImagesRef = database.getReference("SlidingImages");
-
         getDBInfo();
 
         // Auto start of viewpager
         final Handler handler = new Handler();
         final Runnable Update = new Runnable() {
             public void run() {
-                if (currentPage == slidingImages.size()) {
-                    currentPage = 0;
+                if(slidingImages!=null) {
+                    if (currentPage == slidingImages.size()) {
+                        currentPage = 0;
+                    }
+                    mPager.setCurrentItem(currentPage++, true);
                 }
-                mPager.setCurrentItem(currentPage++, true);
             }
         };
         Timer swipeTimer = new Timer();
-        swipeTimer.schedule(new TimerTask() {
+        swipeTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 handler.post(Update);
             }
-        }, 10000, 20000);
+        }, 5000, 10000);
     }
 
     private void getDBInfo(){
 
-        ValueEventListener postListener = new ValueEventListener() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        dbImagesRef = database.getReference("SlidingImages");
+
+        dbHistoryRef = database.getReference("History").child(language);
+
+        dbMenuRef = database.getReference("Menu").child(language);
+
+        dbMessagesRef = database.getReference("Messages").child(language);
+
+        ValueEventListener postListenerImages = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
@@ -477,6 +503,85 @@ public class Main2Activity extends AppCompatActivity
                 // ...
             }
         };
-        dbImagesRef.addListenerForSingleValueEvent(postListener);
+        dbImagesRef.addListenerForSingleValueEvent(postListenerImages);
+
+        ValueEventListener postListenerHistory = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                TextView history = findViewById(R.id.textView_History);
+                TextView historyTitle = findViewById(R.id.tv_main_History);
+
+                History hist = dataSnapshot.getValue(History.class);
+                historyTitle.setText(hist.getTitle());
+                history.setText(hist.getText());
+                history.setMovementMethod(new ScrollingMovementMethod());
+
+                // ...
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("GetBDValueError", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        dbHistoryRef.addListenerForSingleValueEvent(postListenerHistory);
+
+        ValueEventListener postListenerMenu = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                NavigationView nav = findViewById(R.id.nav_view);
+                android.view.Menu menuLayout = nav.getMenu();
+
+                Menu menu = dataSnapshot.getValue(Menu.class);
+
+                menuLayout.findItem(R.id.nav_home).setTitle(menu.getHome());
+                menuLayout.findItem(R.id.nav_language).setTitle(menu.getLanguage());
+                menuLayout.findItem(R.id.nav_myZone).setTitle(menu.getGetMyZone());
+                menuLayout.findItem(R.id.nav_news).setTitle(menu.getNews());
+                menuLayout.findItem(R.id.nav_communicate).setTitle(menu.getCommunicate());
+                menuLayout.findItem(R.id.nav_classify).setTitle(menu.getClassify());
+                menuLayout.findItem(R.id.nav_report).setTitle(menu.getReport());
+
+                msgZoneTitle = menu.getGetMyZone();
+
+                // ...
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("GetBDValueError", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        dbMenuRef.addListenerForSingleValueEvent(postListenerMenu);
+
+        ValueEventListener postListenerMessages = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                Messages msg = dataSnapshot.getValue(Messages.class);
+                zoneNotFound = msg.getZoneNotFound();
+                zoneFound = msg.getZoneFound();
+                notificationMsg = msg.getNotificationMsg();
+
+                // ...
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("GetBDValueError", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        dbMessagesRef.addListenerForSingleValueEvent(postListenerMessages);
     }
 }

@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.iscte.dam.Main2Activity"
-    tools:showIn="@layout/app_bar_main2">
+    tools:showIn="@layout/app_bar_main2"
+    android:background="@drawable/background_transparent">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
@@ -18,7 +19,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <me.relex.circleindicator.CircleIndicator
         android:id="@+id/indicator"
@@ -31,30 +32,38 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/pager" />
 
-    <Button
-        android:id="@+id/button2"
+    <TextView
+        android:id="@+id/tv_main_History"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:onClick="goToLocationTest"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/history"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/indicator"
+        tools:textColor="@color/common_google_signin_btn_text_dark_focused"
+        android:background="@drawable/rounded_textview"/>
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="350dp"
-        android:layout_height="311dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:id="@+id/textView_History"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_textview"
+        android:scrollbars="vertical"
+        android:padding="5dp"
         android:text="Textooooo"
-        app:layout_constraintBottom_toTopOf="@+id/button2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pager" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_main_History" />
 </android.support.constraint.ConstraintLayout>

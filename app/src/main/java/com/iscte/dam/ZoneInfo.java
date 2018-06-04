@@ -89,9 +89,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         String stringZone = preferences.getString("zoo_location", "Default");
 
-        stringZone = "foca_comum";
-
-        if(stringZone == "Default"){
+        if(stringZone.equals("Default")){
             Toast toast = Toast.makeText(getApplicationContext(), "Zone not found!", Toast.LENGTH_SHORT);
             toast.show();
             finish();
@@ -100,7 +98,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         String language = preferences.getString("selected_language","Default");
 
-        if(language == "Default"){
+        if(language.equals("Default")){
             final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
             dialBuilder1.setMessage("Language not choosed! Information displayed will appear in English.")
                     .setTitle("My Zone");
@@ -248,7 +246,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         seekBar.setProgress(mPlayer.getCurrentPosition());
 
         if(mPlayer.isPlaying()){
-            Log.e("playCycle","isplaying");
+            Log.w("playCycle","isplaying");
             runnable = new Runnable() {
                 @Override
                 public void run() {
@@ -279,22 +277,20 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             Toast toastNew = Toast.makeText(getApplicationContext(), "NEW", Toast.LENGTH_SHORT);
             toastNew.show();
 
-            Log.e("startAudio", "failed -> " + resID);
+            Log.w("startAudio", "failed -> " + resID);
 
             try {
-                //descriptor = getAssets().openFd("foca_comum.ogg");
-                //mPlayer.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
                 try {
                     mPlayer.prepare();
                 }catch (IllegalStateException e){
-                    Log.e("startAudio", e.toString());
+                    Log.w("startAudio", e.toString());
                 }
                 mPlayer.start();
                 startPlaying.setImageResource(R.drawable.ic_media_pause);
                 ((ImageButton)view).setImageResource(R.drawable.ic_media_pause);
 
             } catch (IOException e) {
-                Log.e("startAudio", "prepare() failed");
+                Log.w("startAudio", "prepare() failed");
             }
         }
     }
@@ -306,10 +302,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mPlayer.seekTo(progress);
             seekBar.setProgress(progress);
         }
-        else{
-            // the event was fired from code and you shouldn't call player.seekTo()
-        }
-
     }
 
     @Override
