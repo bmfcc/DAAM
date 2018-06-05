@@ -1,4 +1,4 @@
-package com.iscte.dam.models;
+package com.iscte.zoozone.models;
 
 /**
  * Created by b.coitos on 6/2/2018.

@@ -1,13 +1,11 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 /**
  * Created by b.coitos on 5/28/2018.
  */
 
-import android.app.Application;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

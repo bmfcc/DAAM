@@ -1,14 +1,13 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.iscte.dam.models.News;
+import com.iscte.zoozone.models.News;
 
 import java.util.ArrayList;
 

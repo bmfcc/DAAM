@@ -1,10 +1,9 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -24,8 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.iscte.dam.models.Menu;
-import com.iscte.dam.models.News;
+import com.iscte.zoozone.models.Menu;
+import com.iscte.zoozone.models.News;
 
 import java.util.ArrayList;
 

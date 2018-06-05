@@ -1,4 +1,4 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 /**
  * Created by JD on 09-03-2018.
@@ -31,7 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.iscte.dam.models.Zone;
+import com.iscte.zoozone.models.Zone;
 
 import java.io.IOException;
 

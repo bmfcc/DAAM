@@ -1,4 +1,4 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 import android.content.Context;
 

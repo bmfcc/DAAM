@@ -1,7 +1,6 @@
-package com.iscte.dam;
+package com.iscte.zoozone;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +14,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,9 +35,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.iscte.dam.models.History;
-import com.iscte.dam.models.Menu;
-import com.iscte.dam.models.Messages;
+import com.iscte.zoozone.models.History;
+import com.iscte.zoozone.models.Menu;
+import com.iscte.zoozone.models.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
