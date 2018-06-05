@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +26,6 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.iscte.dam.models.Menu;
 import com.iscte.dam.models.News;
-import com.iscte.dam.models.Zone;
 
 import java.util.ArrayList;
 
@@ -76,25 +74,14 @@ public class NewsRV extends AppCompatActivity implements NavigationView.OnNaviga
         mRecyclerView.setHasFixedSize(true);
 
         if(mRecyclerView==null) {
-            Log.e("DAAAAAAAAM", "NULL");
+            Log.e("app", "NewsRV - mRecyclerView - NULL");
         }
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        /*ArrayList<News> myDataset = new ArrayList<>();
-        myDataset.add(new News("Titulo de teste","Short de teste","Desc de teste"));
-        myDataset.add(new News("Titulo de teste1","Short de teste1","Desc de teste1"));
-*/
-
-
         getDBInfo();
-        Log.w("DAAAAAAAAM", "Let's go to Adapter!!!!");
-
-        // specify an adapter (see also next example)
-        /*mAdapter = new RecViewAdapter(newsList);
-        mRecyclerView.setAdapter(mAdapter);*/
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -142,8 +129,6 @@ public class NewsRV extends AppCompatActivity implements NavigationView.OnNaviga
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
-                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                     startActivity(zoneIntent);
                 }
@@ -151,8 +136,6 @@ public class NewsRV extends AppCompatActivity implements NavigationView.OnNaviga
             dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancelled the dialog
-                    Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                 }
             });

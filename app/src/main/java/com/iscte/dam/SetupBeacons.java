@@ -1,7 +1,5 @@
 package com.iscte.dam;
 
-import android.content.SharedPreferences;
-
 /**
  * Created by b.coitos on 5/26/2018.
  */

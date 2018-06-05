@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizardFactory;
@@ -100,7 +99,6 @@ public class Main2Activity extends AppCompatActivity
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         language = preferences.getString("selected_language", "Default");
-        Log.w("TestLanguage", language);
 
         if(language.equals("Default")){
             selectLanguage();
@@ -111,8 +109,6 @@ public class Main2Activity extends AppCompatActivity
             String setupBeacons = SetupBeacons.getInstance().getSetupBeacons();
 
             if(setupBeacons.equals("True")) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Let's START!", Toast.LENGTH_SHORT);
-                toast.show();
                 setupBeacons();
 
                 SetupBeacons.getInstance().setSetupBeacons("False");
@@ -135,28 +131,6 @@ public class Main2Activity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main2, menu);
-        return true;
-    }*/
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -194,96 +168,9 @@ public class Main2Activity extends AppCompatActivity
         super.onResume();
     }
 
-    public void selectedZooLocation(View view){
-        int viewID = view.getId();
-        String resourceName = getResources().getResourceEntryName(viewID);
-        Log.d("MainAtivitityLog",resourceName);
-        Intent intent = new Intent(this, ZoneInfo.class);
-        startActivity(intent);
-    }
-
     public void selectLanguage(){
         Intent intent = new Intent(this, SelectLanguage.class);
         startActivity(intent);
-    }
-
-    public void goToZooLocation(View view){
-        /*Intent intent = new Intent(this, ZoneInfo.class);
-        startActivity(intent);*/
-
-        // Create an Intent for the activity you want to start
-        //Intent intent = new Intent(this, ZoneInfo.class);
-        final Intent notificationIntent = new Intent(this, ZoneInfo.class);
-        notificationIntent.setAction(Intent.ACTION_MAIN);
-        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this,0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Create the TaskStackBuilder and add the intent, which inflates the back stack
-        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addNextIntentWithParentStack(intent);
-        // Get the PendingIntent containing the entire back stack
-        PendingIntent pendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Toast toast = Toast.makeText(getApplicationContext(), "Getting ready", Toast.LENGTH_SHORT);
-        toast.show();
-
-        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID )
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle("ZooZone")
-                .setContentText("Bem-vindo ao ZOO!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(resultPendingIntent)
-                .setAutoCancel(true);
-
-        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
-
-        mChannel.setDescription(description);
-        mChannel.enableVibration(true);
-        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-        notificationManager.createNotificationChannel(mChannel);
-
-
-        notificationManager.notify(64647, mBuilder.build());
-
-        */
-    }
-
-    public void goToLocationTest (View v){
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
-                .setContentTitle("ZooZone")
-                .setContentText("Bem-vindo à Zona do Leão!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
-                .setAutoCancel(true);
-
-        final Intent notificationIntent = new Intent(this, ZoneInfo.class);
-        notificationIntent.setAction(Intent.ACTION_MAIN);
-        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        //notificationIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(ZoneInfo.class);
-        stackBuilder.addNextIntent(notificationIntent);
-
-
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        builder.setContentIntent(resultPendingIntent);
-
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(64647, builder.build());
-
     }
 
     private void setupBeacons(){
@@ -300,9 +187,6 @@ public class Main2Activity extends AppCompatActivity
         stackBuilder.addNextIntent(notificationIntent);
 
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Toast toast = Toast.makeText(getApplicationContext(), "Getting ready", Toast.LENGTH_SHORT);
-        toast.show();
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
@@ -342,12 +226,9 @@ public class Main2Activity extends AppCompatActivity
                             zoo_location = attachment.getPayload().get("beacon_location");
                             zoo_location_desc = attachment.getPayload().get("beacon_location_desc");
                         }
-                        Toast toast = Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT);
-                        toast.show();
+
                         builder.setContentText(notificationMsg.replace("zoneID",zoo_location_desc));
                         notificationManager.notify(64647, builder.build());
-
-                        Log.d("app_beacons", "Entrei");
 
                         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
                         SharedPreferences.Editor editor=preferences.edit();
@@ -361,8 +242,6 @@ public class Main2Activity extends AppCompatActivity
                 .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
                     @Override
                     public Unit invoke(ProximityAttachment attachment) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Byeee", Toast.LENGTH_SHORT);
-                        toast.show();
                         return null;
                     }
                 })
@@ -394,14 +273,9 @@ public class Main2Activity extends AppCompatActivity
                                 return null;
                             }
                         });
-
-
-        Toast toast1 = Toast.makeText(getApplicationContext(), "Everything ready", Toast.LENGTH_SHORT);
-        toast1.show();
     }
 
     private void getMyZone(){
-        //Alerta para a Primeira Atividade
         final AlertDialog.Builder dialBuilder1 = new AlertDialog.Builder(this);
         final Intent zoneIntent = new Intent(this, ZoneInfo.class);
 
@@ -415,8 +289,6 @@ public class Main2Activity extends AppCompatActivity
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
-                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                     startActivity(zoneIntent);
                 }
@@ -424,8 +296,6 @@ public class Main2Activity extends AppCompatActivity
             dialBuilder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancelled the dialog
-                    Toast toast = Toast.makeText(getApplicationContext(), "Oh... OK :´(", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                 }
             });
@@ -486,8 +356,6 @@ public class Main2Activity extends AppCompatActivity
                 // Get Post object and use the values to update the UI
 
                 slidingImages = (ArrayList<String>) dataSnapshot.getValue();
-                Log.w("SLIDEEEE",slidingImages.get(0));
-
 
                 mPager = (ViewPager) findViewById(R.id.pager);
                 mPager.setAdapter(new Adapter(Main2Activity.this,slidingImages));

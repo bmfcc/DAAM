@@ -56,11 +56,8 @@ public class Adapter extends PagerAdapter {
 
         StorageReference imageReference = imagesRef.child(images.get(position));
 
-        Log.w("instantiateItemNOW",imageReference.getPath());
-
         GlideApp.with(view).load(imageReference).into(myImage);
 
-        //myImage.setImageResource(images.get(position));
         view.addView(myImageLayout, 0);
         return myImageLayout;
     }

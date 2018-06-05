@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.iscte.dam.models.News;
 
@@ -40,7 +39,6 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "Title:" + title.getText(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(v.getContext(),NewsView.class);
                     intent.putExtra("title",title.getText());
                     intent.putExtra("shortDesc",shortDescription.getText());
@@ -82,12 +80,6 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        if(newsList.size()>0){
-            Log.e("nooooo", ">0!!!!!");
-        }else{
-            Log.e("nooooo", "<0   NOOOOOOOOOOOOOOOOOOOO");
-        }
-
         return newsList.size();
     }
 }

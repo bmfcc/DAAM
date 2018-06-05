@@ -22,7 +22,7 @@ public class SelectLanguage extends AppCompatActivity {
         int viewID = view.getId();
         String resourceName = getResources().getResourceEntryName(viewID);
         resourceName = resourceName.split("_button")[0];
-        Log.d("MainAtivitityLog",resourceName);
+        Log.d("app","SelectLanguage - Language - "+resourceName);
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         SharedPreferences.Editor editor=preferences.edit();

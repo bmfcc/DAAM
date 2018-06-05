@@ -5,18 +5,13 @@ package com.iscte.dam;
  */
 
 import android.app.AlertDialog;
-import android.app.Notification;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -28,14 +23,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.estimote.mustard.rx_goodness.rx_requirements_wizard.Requirement;
-import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizardFactory;
-import com.estimote.proximity_sdk.proximity.EstimoteCloudCredentials;
-import com.estimote.proximity_sdk.proximity.ProximityAttachment;
-import com.estimote.proximity_sdk.proximity.ProximityObserver;
-import com.estimote.proximity_sdk.proximity.ProximityObserverBuilder;
-import com.estimote.proximity_sdk.proximity.ProximityZone;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,27 +34,17 @@ import com.google.firebase.storage.StorageReference;
 import com.iscte.dam.models.Zone;
 
 import java.io.IOException;
-import java.util.List;
-
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
-import kotlin.jvm.functions.Function1;
 
 
 public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
 
-    private ProximityObserver proximityObserver;
-    private ProximityObserver.Handler proximityHandler = null;
     private ImageButton startPlaying;
     private ImageView animalImage;
     private TextView tViewDesc;
     private TextView tViewTitle;
     private SeekBar seekBar;
     private MediaPlayer mPlayer = null;
-    private String mFileName = null;
-    private AssetFileDescriptor descriptor;
     public static final String PREFS_NAME = "MyPrefsFile";
-    private int resID;
     private Handler handler;
     private Runnable runnable;
 
@@ -105,14 +82,11 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             dialBuilder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User clicked OK button
-                    Toast toast = Toast.makeText(getApplicationContext(), "Let's know more", Toast.LENGTH_SHORT);
-                    toast.show();
                     dialog.dismiss();
                 }
             });
             language="EN";
         }
-
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbRef = database.getReference("Zones").child(language+"/"+stringZone);
@@ -129,14 +103,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Toast.makeText(getApplicationContext(),"Back button clicked", Toast.LENGTH_SHORT).show();
                 super.onBackPressed();
 
-                //SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-                //SharedPreferences.Editor editor=preferences.edit();
-
-                //editor.putString("setupBeacons","false");
-                //editor.commit();
                 mPlayer.stop();
                 break;
         }
@@ -146,11 +114,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        //SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
-        //SharedPreferences.Editor editor=preferences.edit();
-
-        //editor.putString("setupBeacons","false");
-        //editor.commit();
 
         mPlayer.stop();
     }
@@ -160,8 +123,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         StorageReference imageReference = imagesRef.child(zone.getImageFile());
 
-        Log.w("TESTSTORAGE",imageReference.getPath());
-
         GlideApp.with(this).load(imageReference).into(animalImage);
 
     }
@@ -170,9 +131,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         startPlaying = (ImageButton) findViewById(R.id.buttonStartPlay);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         handler = new Handler();
-
-        //resID =getResources().getIdentifier("foca_comum", "raw", getPackageName());
-        //mPlayer = MediaPlayer.create(this,resID);
 
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -196,27 +154,10 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             }
         });
 
-        /*mPlayer = new MediaPlayer();
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mPlayer.setDataSource(audioReference.getPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        /*try {
-            mPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        //seekBar.setMax(mPlayer.getDuration());
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser){
-                    Toast toastPause = Toast.makeText(getApplicationContext(), "from user", Toast.LENGTH_SHORT);
-                    toastPause.show();
                     mPlayer.seekTo(progress);
                 }
             }
@@ -259,38 +200,27 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
     public void startAudio(View view) {
         if(mPlayer != null && mPlayer.isPlaying()){
-            Toast toastPause = Toast.makeText(getApplicationContext(), "Pause", Toast.LENGTH_SHORT);
-            toastPause.show();
             mPlayer.pause();
             ((ImageButton)view).setImageResource((R.drawable.ic_media_play));
-            //startPlaying.setImageResource(R.drawable.ic_media_play);
 
         } else if(mPlayer != null){
-            Toast toastPlay = Toast.makeText(getApplicationContext(), "PLay", Toast.LENGTH_SHORT);
-            toastPlay.show();
             mPlayer.start();
             ((ImageButton)view).setImageResource(R.drawable.ic_media_pause);
-            //startPlaying.setImageResource(R.drawable.ic_media_pause);
             playCycle();
 
         }else{
-            Toast toastNew = Toast.makeText(getApplicationContext(), "NEW", Toast.LENGTH_SHORT);
-            toastNew.show();
-
-            Log.w("startAudio", "failed -> " + resID);
-
             try {
                 try {
                     mPlayer.prepare();
                 }catch (IllegalStateException e){
-                    Log.w("startAudio", e.toString());
+                    Log.w("app", "ZoneInfo - startAudio - prepare() failed");
                 }
                 mPlayer.start();
                 startPlaying.setImageResource(R.drawable.ic_media_pause);
                 ((ImageButton)view).setImageResource(R.drawable.ic_media_pause);
 
             } catch (IOException e) {
-                Log.w("startAudio", "prepare() failed");
+                Log.w("app", "ZoneInfo - startAudio - prepare() failed");
             }
         }
     }
@@ -317,8 +247,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast toast = Toast.makeText(getApplicationContext(), "DESTROYYYYYYYY", Toast.LENGTH_SHORT);
-        toast.show();
 
         if(mPlayer!=null) {
             mPlayer.release();
@@ -329,9 +257,6 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     protected void onResume(){
         super.onResume();
-
-        Toast toast = Toast.makeText(getApplicationContext(), "2nd Activity Resuming", Toast.LENGTH_SHORT);
-        toast.show();
     }
 
     public void textBuild(){

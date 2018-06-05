@@ -46,8 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/indicator"
-        tools:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:background="@drawable/rounded_textview"/>
+        tools:textColor="@color/textColorPrimary"/>
 
     <TextView
         android:id="@+id/textView_History"
