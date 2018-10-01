@@ -5,4 +5,5 @@
     <color name="colorAccent">#3399ff</color>
     <color name="textColorPrimary">#000000</color>
     <color name="text_view_bg">#f2f2f2</color>
+    <color name="paint_map">#66DAA3EB</color>
 </resources>

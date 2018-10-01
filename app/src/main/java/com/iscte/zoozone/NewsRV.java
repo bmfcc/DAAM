@@ -90,7 +90,6 @@ public class NewsRV extends AppCompatActivity implements NavigationView.OnNaviga
         int id = item.getItemId();
 
         if (id == R.id.nav_language) {
-            // Handle the camera action
             Intent intent = new Intent(this, SelectLanguage.class);
             startActivity(intent);
             finish();
@@ -101,8 +100,10 @@ public class NewsRV extends AppCompatActivity implements NavigationView.OnNaviga
             Intent intent = new Intent(this, Main2Activity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_news) {
-
+        } else if (id == R.id.nav_map) {
+            Intent intent = new Intent(this, MapActivity.class);
+            intent.putExtra("mapTitle",item.getTitle());
+            startActivity(intent);
         } else if (id == R.id.nav_report) {
 
         } else if (id == R.id.nav_classify) {

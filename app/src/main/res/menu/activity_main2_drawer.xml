@@ -3,11 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group>
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_action_home"
             android:title="@string/Home" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_menu_map"
+            android:title="Mapa" />
         <item
             android:id="@+id/nav_language"
             android:icon="@drawable/language"

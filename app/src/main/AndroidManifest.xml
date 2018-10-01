@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.iscte.zoozone">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.iscte.zoozone.Main2Activity"
+            android:name=".Main2Activity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,18 +21,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.iscte.zoozone.SelectLanguage" />
+        <activity android:name=".SelectLanguage" />
         <activity
-            android:name="com.iscte.zoozone.ZoneInfo"
-            android:parentActivityName="com.iscte.zoozone.Main2Activity" />
+            android:name=".ZoneInfo"
+            android:parentActivityName=".Main2Activity" />
         <activity
-            android:name="com.iscte.zoozone.NewsRV"
+            android:name=".NewsRV"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.iscte.zoozone.NewsView"
-            android:parentActivityName="com.iscte.zoozone.NewsRV">
-        </activity>
+            android:name=".NewsView"
+            android:parentActivityName=".NewsRV"></activity>
+        <activity android:name=".MapActivity"
+            android:parentActivityName=".Main2Activity"></activity>
     </application>
 
 </manifest>

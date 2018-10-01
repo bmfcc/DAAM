@@ -93,7 +93,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-        imagesRef = storageRef.child("Images");
+        imagesRef = storageRef.child("Images/Zones");
         audioRef = storageRef.child("Audios/"+language);
 
         getDBInfo();

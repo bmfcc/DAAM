@@ -138,14 +138,15 @@ public class Main2Activity extends AppCompatActivity
 
         if (id == R.id.nav_language) {
             // Handle the camera action
-            Intent intent = new Intent(this, SelectLanguage.class);
-            startActivity(intent);
+            selectLanguage();
             finish();
         } else if (id == R.id.nav_myZone) {
             getMyZone();
 
-        } else if (id == R.id.nav_home) {
-
+        } else if (id == R.id.nav_map) {
+            Intent intent = new Intent(this, MapActivity.class);
+            intent.putExtra("mapTitle",item.getTitle());
+            startActivity(intent);
         } else if (id == R.id.nav_news) {
             Intent intent = new Intent(this, NewsRV.class);
             startActivity(intent);
@@ -413,6 +414,7 @@ public class Main2Activity extends AppCompatActivity
                 menuLayout.findItem(R.id.nav_communicate).setTitle(menu.getCommunicate());
                 menuLayout.findItem(R.id.nav_classify).setTitle(menu.getClassify());
                 menuLayout.findItem(R.id.nav_report).setTitle(menu.getReport());
+                menuLayout.findItem(R.id.nav_map).setTitle(menu.getMap());
 
                 msgZoneTitle = menu.getGetMyZone();
 

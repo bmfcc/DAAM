@@ -7,6 +7,7 @@ package com.iscte.zoozone.models;
 public class Menu {
 
     private String home;
+    private String map;
     private String language;
     private String getMyZone;
     private String news;
@@ -16,8 +17,9 @@ public class Menu {
 
     public Menu() {}
 
-    public Menu(String home, String language, String getMyZone, String news, String communicate, String classify, String report) {
+    public Menu(String home, String map, String language, String getMyZone, String news, String communicate, String classify, String report) {
         this.home = home;
+        this.map = map;
         this.language = language;
         this.getMyZone = getMyZone;
         this.news = news;
@@ -33,6 +35,14 @@ public class Menu {
 
     public void setHome(String home) {
         this.home = home;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
     }
 
     public String getLanguage() {
