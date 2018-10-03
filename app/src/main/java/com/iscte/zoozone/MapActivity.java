@@ -5,33 +5,23 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.iscte.zoozone.models.MapInfo;
-import com.iscte.zoozone.models.Settings;
 import com.iscte.zoozone.models.VisitedZones;
-import com.iscte.zoozone.models.Zone;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MapActivity extends AppCompatActivity {
@@ -40,13 +30,9 @@ public class MapActivity extends AppCompatActivity {
 
     private ImageView mapImage;
 
-    private Settings settings;
-
     private ArrayList<MapInfo> mapInfos;
 
     private FirebaseStorage storage;
-    private StorageReference storageRef;
-    private StorageReference imagesRef;
 
     private DatabaseReference dbSettingsRef;
     private DatabaseReference dbMapInfoRef;
@@ -57,8 +43,6 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
 
         storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
-        imagesRef = storageRef.child("Images");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbSettingsRef = database.getReference("Settings");
@@ -75,12 +59,12 @@ public class MapActivity extends AppCompatActivity {
         getDBInfo();
     }
 
-    private void imageBuild() {
+    private void imageBuild(String mapImageName) {
         mapImage = findViewById(R.id.mapImage);
 
         //StorageReference imageReference = imagesRef.child("Map/" + settings.getMapImageName());
 
-        File imgFile = new File(this.getFilesDir(), "map/" + settings.getMapImageName());
+        File imgFile = new File(this.getFilesDir(), "map/" + mapImageName);//settings.getMapImageName());
 
         if (imgFile.exists()) {
 
@@ -118,9 +102,9 @@ public class MapActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
 
-                settings = dataSnapshot.getValue(Settings.class);
-                Log.d("MAP_TEST", "onDataChange: "+ dataSnapshot.getValue());
-                imageBuild();
+                //settings = dataSnapshot.getValue(Settings.class);
+                //Log.d("MAP_TEST1", "onDataChange: "+ dataSnapshot.child("mapImageName").getValue().toString());
+                imageBuild(dataSnapshot.child("mapImageName").getValue().toString());
             }
 
             @Override
@@ -179,7 +163,6 @@ public class MapActivity extends AppCompatActivity {
 
             return  vZones;
 
-            //return null;
         }else{
             ArrayList<String> vZones = new VisitedZones(visitedZones).getVisitedZonesArr();
 

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -24,7 +25,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.iscte.zoozone.models.Language;
 import com.iscte.zoozone.models.SelectLanguageInfo;
-import com.iscte.zoozone.models.Settings;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,8 +45,6 @@ public class SelectLanguage extends AppCompatActivity {
     private StorageReference imagesRef;
 
     private Spinner spinner;
-
-    private Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,10 +126,10 @@ public class SelectLanguage extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
 
-                settings = dataSnapshot.getValue(Settings.class);
-                Log.d("SelectLanguage_getDBInf", "settings: "+ settings.getMapImageName());
+                //settings = dataSnapshot.getValue(Settings.class);
+                //Log.d("SelectLanguage_getDBInf", "settings: "+ settings.getMapImageName());
 
-                getStorageInfo();
+                getStorageInfo(dataSnapshot.child("mapImageName").getValue().toString(),dataSnapshot.child("logoImage").getValue().toString());
             }
 
             @Override
@@ -166,7 +164,7 @@ public class SelectLanguage extends AppCompatActivity {
 
     }
 
-    private void getStorageInfo(){
+    private void getStorageInfo(String mapImageName, String logoImage){
 
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
@@ -174,10 +172,12 @@ public class SelectLanguage extends AppCompatActivity {
 
         Log.d("SelectLanguage_getSTInf", "OK ");
 
+        //Download MapImage
+
         File file = new File(this.getFilesDir(), "map");
         Log.d("SelectLanguage_getSTInf", "getStorageInfo: " + file.getAbsolutePath());
         if(file.exists()){
-            File mapImageFile = new File(file,settings.getMapImageName());
+            File mapImageFile = new File(file,mapImageName);
 
             Log.d("SelectLanguage_getSTInf", "mapImageFile: " + mapImageFile.getName());
             if(isNewVersion()){
@@ -186,11 +186,11 @@ public class SelectLanguage extends AppCompatActivity {
             }
         } else{
             file.mkdirs();
-            File map = new File(file,settings.getMapImageName());
+            File map = new File(file,mapImageName);
 
             Log.d("SelectLanguage_getSTInf", "mapFile: " + map.getName());
 
-            imagesRef.child("Map/" + settings.getMapImageName()).getFile(map).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            imagesRef.child("Map/" + mapImageName).getFile(map).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
@@ -203,6 +203,10 @@ public class SelectLanguage extends AppCompatActivity {
                 }
             });
         }
+
+
+        //Set Logo Image
+        GlideApp.with(this).load(imagesRef.child("Logo/"+logoImage)).into((ImageView)findViewById(R.id.logoImage));
 
     }
 
