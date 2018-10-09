@@ -1,11 +1,15 @@
 package com.iscte.zoozone;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
@@ -80,6 +84,8 @@ public class Main2Activity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        createNotificationChannel();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.textColorPrimary));
         toolbar.setSubtitleTextColor(getResources().getColor(R.color.textColorPrimary));
@@ -98,6 +104,11 @@ public class Main2Activity extends AppCompatActivity
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         language = preferences.getString("selected_language", "Default");
 
+        Intent myIntent = getIntent();
+        String previousLanguage = myIntent.getStringExtra("prevLanguage");
+
+        previousLanguage = previousLanguage == null ? language : previousLanguage;
+
         if(language.equals("Default")){
             selectLanguage();
             finish();
@@ -106,7 +117,11 @@ public class Main2Activity extends AppCompatActivity
 
             String setupBeacons = SetupBeacons.getInstance().getSetupBeacons();
 
-            if(setupBeacons.equals("True")) {
+            if(setupBeacons.equals("True") || language != previousLanguage) {
+
+                if(proximityHandler!=null){
+                    proximityHandler.stop();
+                }
                 setupBeacons();
 
                 SetupBeacons.getInstance().setSetupBeacons("False");
@@ -172,6 +187,22 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
     }
 
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "ZonIntercepted";
+            String description = "Welcome";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     private void setupBeacons(){
         EstimoteCloudCredentials cloudCredentials =
                 new EstimoteCloudCredentials("zoozone-how", "861b9e3dc034aa6c3a7afa2c51220271");
@@ -190,7 +221,7 @@ public class Main2Activity extends AppCompatActivity
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
-                .setContentTitle("ZooZone")
+                .setContentTitle(getString(R.string.app_name))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setAutoCancel(true);

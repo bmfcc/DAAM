@@ -2,16 +2,26 @@ package com.iscte.zoozone;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -45,13 +55,31 @@ public class SelectLanguage extends AppCompatActivity {
     private StorageReference imagesRef;
 
     private Spinner spinner;
+    private Button confirmButton;
+
+    private ConstraintLayout constLayoutProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_language);
 
-        spinner = (Spinner) findViewById(R.id.spinner);
+        constLayoutProgress = findViewById(R.id.constLayoutProgress);
+        constLayoutProgress.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // ignore all touch events
+                return true;
+            }
+        });
+
+        constLayoutProgress.setVisibility(View.VISIBLE);
+
+        spinner = findViewById(R.id.spinner);
+        //spinner.setClickable(false);
+
+        confirmButton = findViewById(R.id.OK_button);
+        //confirmButton.setClickable(false);
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
         language = preferences.getString("selected_language", "Default");
@@ -66,11 +94,14 @@ public class SelectLanguage extends AppCompatActivity {
         Language ln = (Language)spinner.getSelectedItem();
 
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME,0);
+        String previousLanguage = preferences.getString("selected_language", "Default");
+
         SharedPreferences.Editor editor=preferences.edit();
         editor.putString("selected_language",ln.getInitials());
         editor.commit();
 
         Intent intent = new Intent(this, Main2Activity.class);
+        intent.putExtra("prevLanguage",previousLanguage);
         startActivity(intent);
         finish();
     }
@@ -79,8 +110,6 @@ public class SelectLanguage extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbSettingsRef = database.getReference("Settings");
-
-        Log.d("SelectLanguage_getDBInf", "lingua: " + language);
 
         if(language.equals("Default")){
             dbLanguagesRef = database.getReference("Languages").child("EN");
@@ -91,8 +120,6 @@ public class SelectLanguage extends AppCompatActivity {
             dbSelectLanguageRef = database.getReference("SelectLanguageInfo").child(language);
         }
 
-        Log.d("SelectLanguage_getDBInf", "dblangref: OK");
-
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -102,10 +129,7 @@ public class SelectLanguage extends AppCompatActivity {
 
                 languagesList = dataSnapshot.getValue(arrayLang);
 
-                Log.d("SelectLanguage_getDBInf", "lingua: " + languagesList);
-
                 ArrayAdapter<Language> adapter = new ArrayAdapter<Language>(SelectLanguage.this,R.layout.spinner_item, languagesList);
-                //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 adapter.setDropDownViewResource(R.layout.spinner_item);
                 spinner.setAdapter(adapter);
 
@@ -125,9 +149,6 @@ public class SelectLanguage extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-
-                //settings = dataSnapshot.getValue(Settings.class);
-                //Log.d("SelectLanguage_getDBInf", "settings: "+ settings.getMapImageName());
 
                 getStorageInfo(dataSnapshot.child("mapImageName").getValue().toString(),dataSnapshot.child("logoImage").getValue().toString());
             }
@@ -149,7 +170,7 @@ public class SelectLanguage extends AppCompatActivity {
                 SelectLanguageInfo selectLanguageInfo = dataSnapshot.getValue(SelectLanguageInfo.class);
 
                 ((TextView)findViewById(R.id.languageTextView)).setText(selectLanguageInfo.getSelectLanguageMsg());
-                ((Button)findViewById(R.id.OK_button)).setText(selectLanguageInfo.getConfirmButton());
+                confirmButton.setText(selectLanguageInfo.getConfirmButton());
 
             }
 
@@ -170,16 +191,13 @@ public class SelectLanguage extends AppCompatActivity {
         storageRef = storage.getReference();
         imagesRef = storageRef.child("Images");
 
-        Log.d("SelectLanguage_getSTInf", "OK ");
-
         //Download MapImage
 
         File file = new File(this.getFilesDir(), "map");
-        Log.d("SelectLanguage_getSTInf", "getStorageInfo: " + file.getAbsolutePath());
+
         if(file.exists()){
             File mapImageFile = new File(file,mapImageName);
 
-            Log.d("SelectLanguage_getSTInf", "mapImageFile: " + mapImageFile.getName());
             if(isNewVersion()){
 
 
@@ -188,13 +206,10 @@ public class SelectLanguage extends AppCompatActivity {
             file.mkdirs();
             File map = new File(file,mapImageName);
 
-            Log.d("SelectLanguage_getSTInf", "mapFile: " + map.getName());
-
             imagesRef.child("Map/" + mapImageName).getFile(map).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
-                    Log.d("SelectLanguage_getSTInf", "onSuccess: GOT IT");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -204,9 +219,32 @@ public class SelectLanguage extends AppCompatActivity {
             });
         }
 
-
         //Set Logo Image
-        GlideApp.with(this).load(imagesRef.child("Logo/"+logoImage)).into((ImageView)findViewById(R.id.logoImage));
+        GlideApp.with(this).load(imagesRef.child("Logo/"+logoImage)).listener(new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                constLayoutProgress.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
+                    }
+                });
+                constLayoutProgress.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                constLayoutProgress.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
+                    }
+                });
+                constLayoutProgress.setVisibility(View.GONE);
+                return false;
+            }
+        }).into((ImageView)findViewById(R.id.logoImage));
 
     }
 

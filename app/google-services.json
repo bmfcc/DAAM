@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1013675250346:android:b6c83c5a9e74eedc",
         "android_client_info": {
-          "package_name": "com.iscte.dam"
+          "package_name": "com.iscte.zoozone"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "1013675250346-svse7dm22v0lrbmhopackeribsk0iera.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.iscte.dam",
+            "package_name": "com.iscte.zoozone",
             "certificate_hash": "fed09be9eaf2c6cca8e4ab0768d77b8571e47085"
           }
         },

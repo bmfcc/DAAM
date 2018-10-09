@@ -29,7 +29,8 @@ public class VisitedZones {
 
     public void addZone(String zoneID){
 
-        visitedZonesArr.add(zoneID);
+        if(!visitedZonesArr.contains(zoneID))
+            visitedZonesArr.add(zoneID);
 
     }
 

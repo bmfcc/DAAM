@@ -32,8 +32,6 @@ public class MapActivity extends AppCompatActivity {
 
     private ArrayList<MapInfo> mapInfos;
 
-    private FirebaseStorage storage;
-
     private DatabaseReference dbSettingsRef;
     private DatabaseReference dbMapInfoRef;
 
@@ -41,8 +39,6 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-        storage = FirebaseStorage.getInstance();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbSettingsRef = database.getReference("Settings");
@@ -103,7 +99,6 @@ public class MapActivity extends AppCompatActivity {
                 // Get Post object and use the values to update the UI
 
                 //settings = dataSnapshot.getValue(Settings.class);
-                //Log.d("MAP_TEST1", "onDataChange: "+ dataSnapshot.child("mapImageName").getValue().toString());
                 imageBuild(dataSnapshot.child("mapImageName").getValue().toString());
             }
 
@@ -122,16 +117,11 @@ public class MapActivity extends AppCompatActivity {
                 // Get Post object and use the values to update the UI
                 ArrayList<String> vZones = getVisitedZones();
 
-                for(DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                for(String zone: vZones){
+                    MapInfo mapInfo = dataSnapshot.child(zone).getValue(MapInfo.class);
 
-                    if (vZones != null && vZones.contains(postSnapshot.getKey())) {
-
-                        Log.d("MAP_TEST", "mapInfos exists!:" +postSnapshot.getValue());
-
-                        MapInfo mapInfo = postSnapshot.getValue(MapInfo.class);
-
+                    if(mapInfo != null)
                         mapInfos.add(mapInfo);
-                    }
                 }
 
                 dbSettingsRef.addListenerForSingleValueEvent(postSettingsListener);
@@ -155,11 +145,7 @@ public class MapActivity extends AppCompatActivity {
 
         if(visitedZones.equals("Default")){
 
-            //TEST
-            visitedZones="elefante-africano;foca-comum;";
-            ArrayList<String> vZones = new VisitedZones(visitedZones).getVisitedZonesArr();
-
-            Log.d("MAP_TEST", "getVisitedZones: "+ new VisitedZones(visitedZones).toString());
+            ArrayList<String> vZones = new ArrayList<>();
 
             return  vZones;
 

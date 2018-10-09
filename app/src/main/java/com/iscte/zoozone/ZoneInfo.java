@@ -28,12 +28,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.iscte.zoozone.models.VisitedZones;
 import com.iscte.zoozone.models.Zone;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
@@ -51,6 +58,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private Zone zone = null;
 
     private DatabaseReference dbRef;
+    private DatabaseReference dbStatsRef;
 
     private FirebaseStorage storage;
     private StorageReference storageRef;
@@ -90,6 +98,7 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         dbRef = database.getReference("Zones").child(language+"/"+stringZone);
+        dbStatsRef = database.getReference("Stats");
 
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
@@ -97,6 +106,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
         audioRef = storageRef.child("Audios/"+language);
 
         getDBInfo();
+
+        setDBInfo(stringZone);
     }
 
     @Override
@@ -284,6 +295,8 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
                 imageBuild();
                 audioBuild();
                 textBuild();
+
+                setVisitedZone();
                 // ...
             }
 
@@ -295,6 +308,76 @@ public class ZoneInfo extends AppCompatActivity implements SeekBar.OnSeekBarChan
             }
         };
         dbRef.addListenerForSingleValueEvent(postListener);
+    }
+
+    private void setDBInfo(String zone){
+        DatabaseReference visitsRef = dbStatsRef.child("Visits/"+getDate()+"/"+zone);
+
+        visitsRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                Integer currentValue = mutableData.getValue(Integer.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(
+                    DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                System.out.println("Transaction completed");
+            }
+        });
+    }
+
+    private String getDate(){
+        String date = "";
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+
+        date+=year;
+
+        if(month<10){
+            date+="0"+month;
+        }else{
+            date+=month;
+        }
+
+        return date;
+    }
+
+    private void setVisitedZone() {
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, 0);
+        String visitedZones = preferences.getString("visited_zones", "Default");
+
+        VisitedZones visitedZonesObject;
+
+        if (visitedZones.equals("Default")) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("visited_zones", zone.getId());
+            editor.commit();
+
+        } else {
+
+            visitedZonesObject = new VisitedZones(visitedZones);
+
+            ArrayList<String> vZones = visitedZonesObject.getVisitedZonesArr();
+
+            if (!vZones.contains(zone.getId())) {
+                visitedZonesObject.addZone(zone.getId());
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("visited_zones", visitedZonesObject.toString());
+                editor.commit();
+            }
+        }
     }
 
 }
